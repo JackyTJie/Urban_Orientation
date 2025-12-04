@@ -1,0 +1,29 @@
+{% if '图片: images/' in message_content %}
+    {% set parts = message_content.split('图片: ') %}
+    {% if parts[0].strip() %}
+        <p class="mb-0">{{ parts[0].strip() }}</p>
+    {% endif %}
+    {% for part in parts[1:] %}
+        {% if 'images/' in part %}
+            {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
+            <div class="message-image">
+                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded img-enlarge" style="max-width: 150px; max-height: 150px; cursor: pointer;">
+            </div>
+        {% endif %}
+    {% endfor %}
+{% elif '图片已发送: ' in message_content %}
+    {% set parts = message_content.split('图片已发送: ') %}
+    {% if parts[0].strip() %}
+        <p class="mb-0">{{ parts[0].strip() }}</p>
+    {% endif %}
+    {% for part in parts[1:] %}
+        {% if 'images/' in part %}
+            {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
+            <div class="message-image">
+                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded img-enlarge" style="max-width: 150px; max-height: 150px; cursor: pointer;">
+            </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p class="mb-0">{{ message_content }}</p>
+{% endif %}
