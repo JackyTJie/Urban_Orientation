@@ -7,6 +7,16 @@
         <p><strong>用户名:</strong> {{ user.username }}</p>
         <p><strong>邮箱:</strong> {{ user.email }}</p>
         <p><strong>注册时间:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+        <hr>
+
+        <div class="mt-4">
+            <h4>账户管理</h4>
+            <form method="POST" action="{{ url_for('delete_own_user_account') }}"
+                  onsubmit="return confirm('确定要删除您的账户吗？此操作无法撤销，所有您的数据将被永久删除。');">
+                <button type="submit" class="btn btn-danger">删除账户</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

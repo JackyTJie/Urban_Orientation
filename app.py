@@ -244,6 +244,30 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/user/delete', methods=['POST'])
+def delete_own_user_account():
+    """Allow regular users to delete their own account"""
+    if 'user_id' not in session:
+        flash('Please login to delete your account')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    user = User.query.get_or_404(user_id)
+
+    # Delete all conversations for this user
+    Conversation.query.filter_by(user_id=user_id).delete()
+
+    # Delete the user account
+    db.session.delete(user)
+    db.session.commit()
+
+    # Clear the session
+    session.clear()
+
+    flash('您的账户已成功删除')
+    return redirect(url_for('index'))
+
+
 @app.route('/admin/logout')
 def admin_logout():
     """Logout admin"""
