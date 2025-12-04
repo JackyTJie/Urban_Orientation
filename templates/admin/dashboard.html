@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>管理面板</h2>
+        
+        <a href="{{ url_for('create_activity') }}" class="btn btn-primary mb-3">创建新活动</a>
+        <a href="{{ url_for('manage_users') }}" class="btn btn-info mb-3">管理管理员账户</a>
+        
+        {% if activities %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>机器人名称</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.title }}</td>
+                            <td>{{ activity.bot_name }}</td>
+                            <td>{{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ activity.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('manage_keywords', activity_id=activity.id) }}" class="btn btn-info btn-sm">管理关键词</a>
+                                <a href="{{ url_for('edit_activity', activity_id=activity.id) }}" class="btn btn-warning btn-sm">编辑</a>
+                                <form method="POST" action="{{ url_for('delete_activity', activity_id=activity.id) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('确定要删除这个活动吗？')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>暂无活动</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

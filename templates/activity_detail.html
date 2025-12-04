@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>{{ activity.title }}</h1>
+        <p class="lead">机器人: {{ activity.bot_name }}</p>
+        <p>{{ activity.description }}</p>
+
+        <div class="mt-4">
+            <h3>关键词</h3>
+            {% if keywords %}
+                {% for keyword in keywords %}
+                    <div class="keyword-section">
+                        <h5>{{ keyword.keyword }}</h5>
+                        {% if keyword.content %}
+                            {% for content_item in keyword.content %}
+                                {% if content_item.content_type == 'text' %}
+                                    <p>{{ content_item.content_text }}</p>
+                                {% elif content_item.content_type == 'photo' %}
+                                    <img src="{{ url_for('static', filename=content_item.content_photo_path) }}"
+                                         alt="{{ keyword.keyword }}" class="img-fluid">
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>此活动暂无关键词信息</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

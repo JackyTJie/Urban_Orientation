@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>管理员个人资料</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>用户名:</strong> {{ admin.username }}</p>
+                <p><strong>角色:</strong> {{ admin.role }}</p>
+
+                <h4>更改密码</h4>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">当前密码</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">新密码</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">确认新密码</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">更新密码</button>
+                </form>
+
+                {% if admin.role == 'regular' %}
+                    <hr>
+                    <h4>删除账户</h4>
+                    <p class="text-danger">注意：此操作将永久删除您的管理员账户，无法恢复。</p>
+                    <form method="POST" action="{{ url_for('delete_own_admin_account') }}"
+                          onsubmit="return confirm('确定要删除您的管理员账户吗？此操作无法撤销。')">
+                        <button type="submit" class="btn btn-danger">删除我的账户</button>
+                    </form>
+                {% endif %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mt-3">返回管理面板</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

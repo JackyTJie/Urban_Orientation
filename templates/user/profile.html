@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>用户资料</h2>
+        <p><strong>用户名:</strong> {{ user.username }}</p>
+        <p><strong>邮箱:</strong> {{ user.email }}</p>
+        <p><strong>注册时间:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    </div>
+</div>
+{% endblock %}

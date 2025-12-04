@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>管理 "{{ activity.title }}" 的关键词</h2>
+        
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mb-3">返回管理面板</a>
+        <a href="{{ url_for('create_keyword', activity_id=activity.id) }}" class="btn btn-primary mb-3">添加新关键词</a>
+        
+        {% if keywords %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>关键词</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for keyword in keywords %}
+                        <tr>
+                            <td>{{ keyword.keyword }}</td>
+                            <td>{{ keyword.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('manage_content', keyword_id=keyword.id) }}" class="btn btn-info btn-sm">管理内容</a>
+                                <a href="{{ url_for('edit_keyword', keyword_id=keyword.id) }}" class="btn btn-warning btn-sm">编辑</a>
+                                <form method="POST" action="{{ url_for('delete_keyword', keyword_id=keyword.id) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('确定要删除这个关键词吗？')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>此活动暂无关键词</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Project Introduction Card -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h1 class="card-title">欢迎来到城市定向社团</h1>
+                    <p class="lead">探索城市，发现新知，与我们一起开启定向之旅</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Description Card -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-primary">项目介绍</h3>
+                    <p class="card-text">
+                        城市定向社团是一个专注于城市探索和定向活动的组织。
+                        我们致力于通过定向活动，让人们更深入地了解城市文化，
+                        激发探索精神，提升团队合作能力。
+                    </p>
+
+                    <h4 class="mt-4 text-secondary">活动特色</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">互动式城市探索</li>
+                        <li class="list-group-item">丰富的知识问答</li>
+                        <li class="list-group-item">智能机器人引导</li>
+                        <li class="list-group-item">个性化活动体验</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Activities Card -->
+    {% if activities %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">近期活动</h3>
+                </div>
+                <div class="card-body">
+                    {% for activity in activities %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ activity.title }}</h5>
+                            <p class="card-text">{{ activity.description }}</p>
+                            <small class="text-muted">机器人: {{ activity.bot_name }} | 时间: {{ activity.created_at.strftime('%Y-%m-%d') }}</small>
+                            <a href="{{ url_for('activity_chat', activity_id=activity.id) }}" class="btn btn-outline-primary btn-sm float-end">了解详情</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
