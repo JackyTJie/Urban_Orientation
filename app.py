@@ -72,10 +72,23 @@ def activity_chat(activity_id):
                         keyword = kw
                         break
 
-            # Use first keyword if no match found
+            # If no keyword was matched at all, don't respond
             if not keyword:
-                keyword = Keyword.query.filter_by(activity_id=activity_id).first()
+                # Save user message to conversation only
+                user_conversation = Conversation(
+                    user_id=user_id,
+                    activity_id=activity.id,
+                    keyword_id=1,  # Default to 1 if no keywords exist
+                    message=user_message,
+                    timestamp=datetime.utcnow()
+                )
+                db.session.add(user_conversation)
 
+                # Don't create a bot response when no keyword matches
+                db.session.commit()
+                return redirect(url_for('activity_chat', activity_id=activity_id))
+
+            # If we have a keyword, proceed with normal flow
             keyword_id = keyword.id if keyword else 1  # Default to 1 if no keywords exist
 
             # Save user message to conversation
