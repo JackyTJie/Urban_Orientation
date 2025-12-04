@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center">欢迎来到城市定向社团</h1>
+        <p class="lead text-center">探索城市，发现新知，与我们一起开启定向之旅</p>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">社团介绍</h3>
+                <p class="card-text">
+                    城市定向社团是一个专注于城市探索和定向活动的组织。
+                    我们致力于通过定向活动，让人们更深入地了解城市文化，
+                    激发探索精神，提升团队合作能力。
+                </p>
+                
+                <h4 class="mt-4">活动特色</h4>
+                <ul>
+                    <li>互动式城市探索</li>
+                    <li>丰富的知识问答</li>
+                    <li>智能机器人引导</li>
+                    <li>个性化活动体验</li>
+                </ul>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('activities') }}" class="btn btn-primary btn-lg">开始探索</a>
+                    {% if not session.user_id %}
+                        <a href="{{ url_for('register') }}" class="btn btn-success btn-lg">注册参与</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

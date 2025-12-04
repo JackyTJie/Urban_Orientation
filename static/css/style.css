@@ -1,0 +1,99 @@
+/* Basic styles for Urban Orientation Platform */
+
+body {
+    padding-top: 70px; /* To account for the fixed navbar */
+}
+
+/* Footer styling */
+.footer {
+    margin-top: auto;
+    width: 100%;
+}
+
+/* Card styling */
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Navigation styling */
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Button styling */
+.btn {
+    margin: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding-top: 100px; /* Increase padding for mobile with expanded navbar */
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+}
+
+/* Activity detail page */
+.keyword-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-left: 4px solid #007bff;
+    background-color: #f8f9fa;
+}
+
+/* Conversation styling */
+.conversation-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    max-width: 70%;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background-color: #e9ecef;
+    color: #333;
+    margin-right: auto;
+}
+
+/* Mobile navigation adjustments */
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 500;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+}

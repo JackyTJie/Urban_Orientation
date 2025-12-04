@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ activity.title }} - {{ activity.bot_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0" style="max-width: 100%;">
+    <!-- Chat header -->
+    <div class="chat-header bg-primary text-white p-3 d-flex align-items-center">
+        <a href="{{ url_for('activities') }}" class="text-white me-3">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+            <h5 class="mb-0">{{ activity.bot_name }}</h5>
+            <small>在线</small>
+        </div>
+    </div>
+
+    <!-- Chat messages container -->
+    <div id="chat-container" class="chat-messages p-3" style="height: 70vh; overflow-y: auto; background-color: #f5f5f5;">
+        {% if conversations %}
+            {% for conv in conversations %}
+                {% if conv.user_id == session.user_id %}
+                    <!-- User message (right-aligned) -->
+                    <div class="message-bubble user-message d-flex justify-content-end mb-3">
+                        <div class="message-content bg-primary text-white p-3 rounded-3" style="max-width: 70%;">
+                            <p class="mb-0">{{ conv.message }}</p>
+                            <small class="text-light">{{ conv.timestamp.strftime('%H:%M') }}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Bot message (left-aligned) -->
+                    <div class="message-bubble bot-message d-flex mb-3">
+                        <div class="bot-avatar me-2">
+                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
+                            </div>
+                        </div>
+                        <div class="message-content bg-light p-3 rounded-3" style="max-width: 70%;">
+                            <h6 class="mb-0">{{ activity.bot_name }}</h6>
+                            <p class="mb-0">{{ conv.message }}</p>
+                            <small class="text-muted">{{ conv.timestamp.strftime('%H:%M') }}</small>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <!-- Welcome message -->
+            <div class="message-bubble bot-message d-flex mb-3">
+                <div class="bot-avatar me-2">
+                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
+                    </div>
+                </div>
+                <div class="message-content bg-light p-3 rounded-3" style="max-width: 70%;">
+                    <h6 class="mb-0">{{ activity.bot_name }}</h6>
+                    <p class="mb-0">你好！欢迎来到 {{ activity.title }} 活动。我可以为你提供关于活动的详细信息。请输入你感兴趣的话题或关键词。</p>
+                    <small class="text-muted">{{ activity.created_at.strftime('%H:%M') }}</small>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Chat input -->
+    <div class="chat-input bg-light p-3 border-top">
+        <form method="POST" action="{{ url_for('activity_chat', activity_id=activity.id) }}" class="d-flex">
+            <input type="text" class="form-control me-2" name="message" id="messageInput"
+                   placeholder="输入消息..." required>
+            <button type="submit" class="btn btn-primary">发送</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-messages {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CiAgPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZjVmNfVmIi8+CiAgPHBhdGggZD0iTTAgMEw0MCA0ME00MCwwIEwwIDQwIiBzdHJva2U9IiNlOGU4ZWIiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=');
+}
+
+.message-bubble .message-content {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.user-message .message-content {
+    border-bottom-right-radius: 0 !important;
+}
+
+.bot-message .message-content {
+    border-bottom-left-radius: 0 !important;
+}
+
+/* Smooth scrolling */
+#chat-container {
+    scroll-behavior: smooth;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of conversation
+    const container = document.getElementById('chat-container');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Focus on message input
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.focus();
+    }
+
+    // Handle Enter key to send message (without submitting form)
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('form').submit();
+        }
+    });
+});
+</script>
+{% endblock %}

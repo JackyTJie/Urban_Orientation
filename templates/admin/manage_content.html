@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>管理 "{{ keyword.keyword }}" 的内容</h2>
+        
+        <a href="{{ url_for('manage_keywords', activity_id=keyword.activity.activity_id) }}" class="btn btn-secondary mb-3">返回关键词列表</a>
+        <a href="{{ url_for('create_content', keyword_id=keyword.id) }}" class="btn btn-primary mb-3">添加新内容</a>
+        
+        {% if content_items %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>内容</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for content in content_items %}
+                        <tr>
+                            <td>{{ content.content_type }}</td>
+                            <td>
+                                {% if content.content_type == 'text' %}
+                                    {{ content.content_text[:100] }}{% if content.content_text|length > 100 %}...{% endif %}
+                                {% elif content.content_type == 'photo' %}
+                                    <img src="{{ url_for('static', filename=content.content_photo_path) }}" 
+                                         alt="Content Image" class="img-thumbnail" style="max-height: 100px;">
+                                {% endif %}
+                            </td>
+                            <td>{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <!-- In a complete implementation, you'd have edit/delete buttons -->
+                                <form method="POST" action="#" style="display: inline;"
+                                      onsubmit="return confirm('确定要删除这个内容吗？')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>此关键词暂无内容</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

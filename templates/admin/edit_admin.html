@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>编辑管理员: {{ admin.username }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ admin.username }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">新密码 (留空则不更改)</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    {% if session.admin_role == 'root' and admin.id != session.admin_id %}
+                        <div class="mb-3">
+                            <label for="role" class="form-label">角色</label>
+                            <select class="form-control" id="role" name="role">
+                                <option value="regular" {% if admin.role == 'regular' %}selected{% endif %}>普通管理员</option>
+                                <option value="root" {% if admin.role == 'root' %}selected{% endif %}>根管理员</option>
+                            </select>
+                        </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">更新管理员</button>
+                    {% if session.admin_role == 'root' %}
+                        <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">取消</a>
+                    {% else %}
+                        <a href="{{ url_for('admin_profile') }}" class="btn btn-secondary">取消</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
