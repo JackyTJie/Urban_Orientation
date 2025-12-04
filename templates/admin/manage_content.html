@@ -5,7 +5,7 @@
     <div class="col-12">
         <h2>管理 "{{ keyword.keyword }}" 的内容</h2>
         
-        <a href="{{ url_for('manage_keywords', activity_id=keyword.activity.activity_id) }}" class="btn btn-secondary mb-3">返回关键词列表</a>
+        <a href="{{ url_for('manage_keywords', activity_id=keyword.activity.id) }}" class="btn btn-secondary mb-3">返回关键词列表</a>
         <a href="{{ url_for('create_content', keyword_id=keyword.id) }}" class="btn btn-primary mb-3">添加新内容</a>
         
         {% if content_items %}

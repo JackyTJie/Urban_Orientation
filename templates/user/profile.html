@@ -7,35 +7,6 @@
         <p><strong>用户名:</strong> {{ user.username }}</p>
         <p><strong>邮箱:</strong> {{ user.email }}</p>
         <p><strong>注册时间:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-        
-        <h3 class="mt-4">对话历史</h3>
-        {% if conversations_by_activity %}
-            {% for activity_id, data in conversations_by_activity.items() %}
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5>{{ data.activity.title }}</h5>
-                        <small>机器人: {{ data.activity.bot_name }}</small>
-                    </div>
-                    <div class="card-body">
-                        {% set recent_messages = data.messages[:5] %} <!-- Show last 5 messages -->
-                        {% for conv in recent_messages %}
-                            <div class="message {% if conv.user_id == session.user_id %}user-message{% else %}bot-message{% endif %}">
-                                <strong>
-                                    {% if conv.user_id == session.user_id %}您{% else %}{{ data.activity.bot_name }}{% endif %}:
-                                </strong> 
-                                {{ conv.message[:100] }}{% if conv.message|length > 100 %}...{% endif %}
-                                <small class="text-muted d-block">{{ conv.timestamp.strftime('%m-%d %H:%M') }}</small>
-                            </div>
-                        {% endfor %}
-                        {% if data.messages|length > 5 %}
-                            <a href="{{ url_for('activity_chat', activity_id=data.activity.id) }}" class="btn btn-sm btn-outline-primary">查看更多</a>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>暂无对话历史</p>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

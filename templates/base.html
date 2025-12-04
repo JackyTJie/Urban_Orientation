@@ -32,16 +32,6 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('user_profile') }}">个人资料</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('logout') }}">退出</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">登录</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register') }}">注册</a>
-                        </li>
                     {% endif %}
 
                     {% if session.admin_id %}
@@ -51,13 +41,23 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">管理面板</a></li>
+                                {% if session.admin_role == 'root' %}
+                                <li><a class="dropdown-item" href="{{ url_for('create_admin') }}">增加管理员</a></li>
+                                {% endif %}
                                 <li><a class="dropdown-item" href="{{ url_for('admin_profile') }}">个人资料</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('admin_logout') }}">退出</a></li>
                             </ul>
                         </li>
+                    {% elif session.user_id %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">退出</a>
+                        </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin_login') }}">管理员登录</a>
+                            <a class="nav-link" href="{{ url_for('login') }}">登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">注册</a>
                         </li>
                     {% endif %}
                 </ul>

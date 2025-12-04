@@ -14,7 +14,7 @@
                         <input type="text" class="form-control" id="keyword" name="keyword" value="{{ keyword.keyword }}" required>
                     </div>
                     <button type="submit" class="btn btn-primary">更新关键词</button>
-                    <a href="{{ url_for('manage_keywords', activity_id=keyword.activity_id) }}" class="btn btn-secondary">取消</a>
+                    <a href="{{ url_for('manage_keywords', activity_id=keyword.activity.id) }}" class="btn btn-secondary">取消</a>
                 </form>
             </div>
         </div>

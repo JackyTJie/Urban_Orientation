@@ -15,7 +15,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # Initialize database
 db = SQLAlchemy(app)
 
-# Import models after db initialization to avoid circular imports
+# Initialize models with the db instance
+from models import init_db
+init_db(db)
 from models import User, Admin, Activity, Keyword, Content, Conversation
 
 # Create tables
@@ -26,7 +28,9 @@ with app.app_context():
 @app.route('/')
 def index():
     """Home page with introduction to 城市定向社团"""
-    return render_template('index.html')
+    # Get latest activities for display on homepage
+    activities = Activity.query.order_by(Activity.created_at.desc()).limit(5).all()
+    return render_template('index.html', activities=activities)
 
 @app.route('/activities')
 def activities():
@@ -54,17 +58,19 @@ def activity_chat(activity_id):
         user_message = request.form['message']
         if user_message.strip():
             # Find the keyword that matches the user message
+            # First try exact match
             keyword = Keyword.query.filter(
                 Keyword.activity_id == activity_id,
                 db.func.lower(Keyword.keyword) == db.func.lower(user_message)
             ).first()
 
             if not keyword:
-                # Try to find partial match
-                keyword = Keyword.query.filter(
-                    Keyword.activity_id == activity_id,
-                    db.func.lower(Keyword.keyword).contains(db.func.lower(user_message))
-                ).first()
+                # Try to find partial match in user message
+                keywords = Keyword.query.filter_by(activity_id=activity_id).all()
+                for kw in keywords:
+                    if user_message.lower().find(kw.keyword.lower()) != -1:
+                        keyword = kw
+                        break
 
             # Use first keyword if no match found
             if not keyword:
@@ -94,7 +100,8 @@ def activity_chat(activity_id):
                         if content.content_type == 'text' and content.content_text:
                             responses.append(content.content_text)
                         elif content.content_type == 'photo' and content.content_photo_path:
-                            responses.append(f"图片: {content.content_photo_path}")
+                            # Include the image path in the response for proper display
+                            responses.append(f"图片已发送: {content.content_photo_path}")
 
                     bot_response = " ".join(responses) if responses else bot_response
 
@@ -122,19 +129,29 @@ def activity_chat(activity_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """User login"""
+    """Unified login for users and admins"""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
+        # Check if it's an admin login
+        admin = Admin.query.filter_by(username=username).first()
+        if admin and check_password_hash(admin.password_hash, password):
+            session['admin_id'] = admin.id
+            session['admin_role'] = admin.role
+            session['user_type'] = 'admin'  # Add this to distinguish admin session
+            return redirect(url_for('index'))
+
+        # Check if it's a regular user login
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             session['user_type'] = 'user'
             return redirect(url_for('index'))
-        else:
-            flash('Invalid username or password')
-    
+
+        # If neither, show error
+        flash('Invalid username or password')
+
     return render_template('user/login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -201,31 +218,18 @@ def user_profile():
 def logout():
     """Logout user"""
     session.pop('user_id', None)
+    session.pop('admin_id', None)
+    session.pop('admin_role', None)
     session.pop('user_type', None)
     return redirect(url_for('index'))
 
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    """Admin login"""
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        admin = Admin.query.filter_by(username=username).first()
-        if admin and check_password_hash(admin.password_hash, password):
-            session['admin_id'] = admin.id
-            session['admin_role'] = admin.role
-            return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Invalid admin username or password')
-    
-    return render_template('admin/admin_login.html')
 
 @app.route('/admin/logout')
 def admin_logout():
     """Logout admin"""
     session.pop('admin_id', None)
     session.pop('admin_role', None)
+    session.pop('user_type', None)  # Also clear user_type
     return redirect(url_for('index'))
 
 @app.route('/admin/dashboard')
@@ -233,7 +237,7 @@ def admin_dashboard():
     """Admin dashboard - only accessible to logged-in admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     # Get all activities
     activities = Activity.query.all()
@@ -244,7 +248,7 @@ def create_activity():
     """Create new activity - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     if request.method == 'POST':
         title = request.form['title']
@@ -272,7 +276,7 @@ def edit_activity(activity_id):
     """Edit an activity - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     activity = Activity.query.get_or_404(activity_id)
     
@@ -293,7 +297,7 @@ def delete_activity(activity_id):
     """Delete an activity - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     activity = Activity.query.get_or_404(activity_id)
 
@@ -316,7 +320,7 @@ def manage_keywords(activity_id):
     """Manage keywords for an activity - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     activity = Activity.query.get_or_404(activity_id)
     keywords = Keyword.query.filter_by(activity_id=activity_id).all()
@@ -329,7 +333,7 @@ def create_keyword(activity_id):
     """Create a new keyword for an activity - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     activity = Activity.query.get_or_404(activity_id)
 
@@ -361,7 +365,7 @@ def edit_keyword(keyword_id):
     """Edit a keyword - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     keyword = Keyword.query.get_or_404(keyword_id)
 
@@ -379,7 +383,7 @@ def delete_keyword(keyword_id):
     """Delete a keyword - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     keyword = Keyword.query.get_or_404(keyword_id)
     activity_id = keyword.activity_id
@@ -399,7 +403,7 @@ def manage_content(keyword_id):
     """Manage content for a keyword - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     keyword = Keyword.query.get_or_404(keyword_id)
     content_items = Content.query.filter_by(keyword_id=keyword_id).all()
@@ -412,7 +416,7 @@ def create_content(keyword_id):
     """Create content for a keyword - only accessible to admins"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     keyword = Keyword.query.get_or_404(keyword_id)
 
@@ -439,6 +443,9 @@ def create_content(keyword_id):
                     import uuid
                     filename = f"{uuid.uuid4()}_{photo.filename}"
                     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+                    # Create upload directory if it doesn't exist
+                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
                     photo.save(filepath)
 
@@ -471,7 +478,7 @@ def manage_users():
     """Manage admin accounts - only accessible to root admin"""
     if 'admin_id' not in session or session.get('admin_role') != 'root':
         flash('Access denied')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     admins = Admin.query.all()
     return render_template('admin/manage_users.html', admins=admins)
@@ -481,7 +488,7 @@ def create_admin():
     """Create new admin account - only accessible to root admin"""
     if 'admin_id' not in session or session.get('admin_role') != 'root':
         flash('Access denied')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     if request.method == 'POST':
         username = request.form['username']
@@ -515,7 +522,7 @@ def edit_admin(admin_id):
     """Edit admin account - only accessible to root admin"""
     if 'admin_id' not in session or session.get('admin_role') != 'root':
         flash('Access denied')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     admin = Admin.query.get_or_404(admin_id)
 
@@ -551,7 +558,7 @@ def delete_admin(admin_id):
     """Delete admin account - only accessible to root admin"""
     if 'admin_id' not in session or session.get('admin_role') != 'root':
         flash('Access denied')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
     
     admin = Admin.query.get_or_404(admin_id)
     
@@ -571,7 +578,7 @@ def admin_profile():
     """Admin profile - for regular admins to change password"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     admin = Admin.query.get_or_404(session['admin_id'])
 
@@ -603,7 +610,7 @@ def delete_own_admin_account():
     """Allow regular admins to delete their own account"""
     if 'admin_id' not in session:
         flash('Please login as admin')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('login'))
 
     admin = Admin.query.get_or_404(session['admin_id'])
     admin_role = session.get('admin_role')

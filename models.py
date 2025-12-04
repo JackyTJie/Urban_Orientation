@@ -1,89 +1,114 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+# Global variable to hold the db instance
+_db = None
 
-class User(db.Model):
-    __tablename__ = 'users'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationship with conversations
-    conversations = db.relationship('Conversation', backref='user', lazy=True)
+def init_db(database):
+    global _db
+    _db = database
+    # Now that _db is set, we can define the models
+    global User, Admin, Activity, Keyword, Content, Conversation
+    User = _create_user_model()
+    Admin = _create_admin_model()
+    Activity = _create_activity_model()
+    Keyword = _create_keyword_model()
+    Content = _create_content_model()
+    Conversation = _create_conversation_model()
 
-    def __repr__(self):
-        return f'<User {self.username}>'
+def _create_user_model():
+    class User(_db.Model):
+        __tablename__ = 'users'
 
-class Admin(db.Model):
-    __tablename__ = 'admins'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(20), default='regular')  # 'root' or 'regular'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<Admin {self.username}>'
+        id = _db.Column(_db.Integer, primary_key=True)
+        username = _db.Column(_db.String(80), unique=True, nullable=False)
+        email = _db.Column(_db.String(120), unique=True, nullable=False)
+        password_hash = _db.Column(_db.String(120), nullable=False)
+        created_at = _db.Column(_db.DateTime, default=datetime.utcnow)
 
-class Activity(db.Model):
-    __tablename__ = 'activities'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    bot_name = db.Column(db.String(100), default='Activity Bot')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relationship with keywords
-    keywords = db.relationship('Keyword', backref='activity', lazy=True, cascade='all, delete-orphan')
+        # Relationship with conversations
+        conversations = _db.relationship('Conversation', backref='user', lazy=True)
 
-    def __repr__(self):
-        return f'<Activity {self.title}>'
+        def __repr__(self):
+            return f'<User {self.username}>'
+    return User
 
-class Keyword(db.Model):
-    __tablename__ = 'keywords'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    activity_id = db.Column(db.Integer, db.ForeignKey('activities.id'), nullable=False)
-    keyword = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationship with content
-    content = db.relationship('Content', backref='keyword', lazy=True, cascade='all, delete-orphan')
-    # Relationship with conversations
-    conversations = db.relationship('Conversation', backref='keyword', lazy=True)
+def _create_admin_model():
+    class Admin(_db.Model):
+        __tablename__ = 'admins'
 
-    def __repr__(self):
-        return f'<Keyword {self.keyword}>'
+        id = _db.Column(_db.Integer, primary_key=True)
+        username = _db.Column(_db.String(80), unique=True, nullable=False)
+        password_hash = _db.Column(_db.String(120), nullable=False)
+        role = _db.Column(_db.String(20), default='regular')  # 'root' or 'regular'
+        created_at = _db.Column(_db.DateTime, default=datetime.utcnow)
 
-class Content(db.Model):
-    __tablename__ = 'content'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    keyword_id = db.Column(db.Integer, db.ForeignKey('keywords.id'), nullable=False)
-    content_type = db.Column(db.String(10), default='text')  # 'text' or 'photo'
-    content_text = db.Column(db.Text)
-    content_photo_path = db.Column(db.String(200))  # Path to stored photo
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+        def __repr__(self):
+            return f'<Admin {self.username}>'
+    return Admin
 
-    def __repr__(self):
-        return f'<Content {self.content_type} for keyword {self.keyword.keyword}>'
+def _create_activity_model():
+    class Activity(_db.Model):
+        __tablename__ = 'activities'
 
-class Conversation(db.Model):
-    __tablename__ = 'conversations'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    activity_id = db.Column(db.Integer, db.ForeignKey('activities.id'), nullable=False)
-    keyword_id = db.Column(db.Integer, db.ForeignKey('keywords.id'), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+        id = _db.Column(_db.Integer, primary_key=True)
+        title = _db.Column(_db.String(200), nullable=False)
+        description = _db.Column(_db.Text)
+        bot_name = _db.Column(_db.String(100), default='Activity Bot')
+        created_at = _db.Column(_db.DateTime, default=datetime.utcnow)
+        updated_at = _db.Column(_db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __repr__(self):
-        return f'<Conversation by {self.user.username} at {self.timestamp}>'
+        # Relationship with keywords
+        keywords = _db.relationship('Keyword', backref='activity', lazy=True, cascade='all, delete-orphan')
+
+        def __repr__(self):
+            return f'<Activity {self.title}>'
+    return Activity
+
+def _create_keyword_model():
+    class Keyword(_db.Model):
+        __tablename__ = 'keywords'
+
+        id = _db.Column(_db.Integer, primary_key=True)
+        activity_id = _db.Column(_db.Integer, _db.ForeignKey('activities.id'), nullable=False)
+        keyword = _db.Column(_db.String(100), nullable=False)
+        created_at = _db.Column(_db.DateTime, default=datetime.utcnow)
+
+        # Relationship with content
+        content = _db.relationship('Content', backref='keyword', lazy=True, cascade='all, delete-orphan')
+        # Relationship with conversations
+        conversations = _db.relationship('Conversation', backref='keyword', lazy=True)
+
+        def __repr__(self):
+            return f'<Keyword {self.keyword}>'
+    return Keyword
+
+def _create_content_model():
+    class Content(_db.Model):
+        __tablename__ = 'content'
+
+        id = _db.Column(_db.Integer, primary_key=True)
+        keyword_id = _db.Column(_db.Integer, _db.ForeignKey('keywords.id'), nullable=False)
+        content_type = _db.Column(_db.String(10), default='text')  # 'text' or 'photo'
+        content_text = _db.Column(_db.Text)
+        content_photo_path = _db.Column(_db.String(200))  # Path to stored photo
+        created_at = _db.Column(_db.DateTime, default=datetime.utcnow)
+
+        def __repr__(self):
+            return f'<Content {self.content_type} for keyword {self.keyword.keyword}>'
+    return Content
+
+def _create_conversation_model():
+    class Conversation(_db.Model):
+        __tablename__ = 'conversations'
+
+        id = _db.Column(_db.Integer, primary_key=True)
+        user_id = _db.Column(_db.Integer, _db.ForeignKey('users.id'), nullable=False)
+        activity_id = _db.Column(_db.Integer, _db.ForeignKey('activities.id'), nullable=False)
+        keyword_id = _db.Column(_db.Integer, _db.ForeignKey('keywords.id'), nullable=False)
+        message = _db.Column(_db.Text, nullable=False)
+        timestamp = _db.Column(_db.DateTime, default=datetime.utcnow)
+
+        def __repr__(self):
+            return f'<Conversation by {self.user.username} at {self.timestamp}>'
+    return Conversation
