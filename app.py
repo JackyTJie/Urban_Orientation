@@ -80,7 +80,8 @@ def activity_chat(activity_id):
                     activity_id=activity.id,
                     keyword_id=1,  # Default to 1 if no keywords exist
                     message=user_message,
-                    timestamp=datetime.utcnow()
+                    timestamp=datetime.utcnow(),
+                    sender_type='user'
                 )
                 db.session.add(user_conversation)
 
@@ -97,7 +98,8 @@ def activity_chat(activity_id):
                 activity_id=activity.id,
                 keyword_id=keyword_id,
                 message=user_message,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.utcnow(),
+                sender_type='user'
             )
             db.session.add(user_conversation)
 
@@ -124,7 +126,8 @@ def activity_chat(activity_id):
                 activity_id=activity.id,
                 keyword_id=keyword_id,
                 message=bot_response,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.utcnow(),
+                sender_type='bot'
             )
             db.session.add(bot_conversation)
 
@@ -138,7 +141,11 @@ def activity_chat(activity_id):
         activity_id=activity_id
     ).order_by(Conversation.timestamp).all()
 
-    return render_template('activity_chat.html', activity=activity, conversations=conversations)
+    # Get the user object to access username
+    from models import User
+    user_obj = User.query.get(user_id)
+
+    return render_template('activity_chat.html', activity=activity, conversations=conversations, username=user_obj.username)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

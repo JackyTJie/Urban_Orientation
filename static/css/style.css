@@ -1,45 +1,68 @@
-/* Basic styles for Urban Orientation Platform */
+/* Basic styles for Urban Orientation Platform with advanced color scheme */
+
+:root {
+    --primary-dark: #132843;
+    --primary-medium: #3966A2;
+    --primary-light: #6191D3;
+    --primary-very-light: #D6DEEB;
+    --primary-background: #F8F6F6;
+}
 
 body {
     padding-top: 0px; /* Remove top padding to position navbar at the top */
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--primary-background) 0%, #e9ecef 100%);
     min-height: 100vh;
+    color: var(--primary-dark);
 }
 
 /* Footer styling */
 .footer {
     margin-top: auto;
     width: 100%;
-    background-color: #343a40;
+    background-color: var(--primary-dark);
     color: white;
 }
 
 /* Card styling */
 .card {
     border-radius: 10px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 12px rgba(19, 40, 67, 0.1);
     transition: 0.3s;
     border: none;
     margin-bottom: 1.5rem;
+    background-color: white;
 }
 
 .card:hover {
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 24px rgba(19, 40, 67, 0.15);
     transform: translateY(-2px);
 }
 
 .card-header {
     border-radius: 10px 10px 0 0 !important;
+    background-color: var(--primary-light);
+    color: white;
+    border: none;
 }
 
 /* Navigation styling */
 .navbar {
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(19, 40, 67, 0.1);
+    background-color: var(--primary-dark) !important;
 }
 
 .navbar-brand {
     font-weight: bold;
     font-size: 1.5rem;
+    color: white !important;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover {
+    color: var(--primary-very-light) !important;
 }
 
 /* Button styling */
@@ -50,34 +73,43 @@ body {
 }
 
 .btn-primary {
-    background-color: #4361ee;
-    border-color: #4361ee;
+    background-color: var(--primary-medium);
+    border-color: var(--primary-medium);
 }
 
 .btn-primary:hover {
-    background-color: #3a56d4;
-    border-color: #3a56d4;
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
 }
 
 .btn-outline-primary {
-    color: #4361ee;
-    border-color: #4361ee;
+    color: var(--primary-medium);
+    border-color: var(--primary-medium);
 }
 
 .btn-outline-primary:hover {
-    background-color: #4361ee;
-    border-color: #4361ee;
+    background-color: var(--primary-medium);
+    border-color: var(--primary-medium);
 }
 
 .btn-success {
-    background-color: #06d6a0;
-    border-color: #06d6a0;
+    background-color: #28a745;
+    border-color: #28a745;
 }
 
 .btn-success:hover {
-    background-color: #05c191;
-    border-color: #05c191;
+    background-color: #218838;
+    border-color: #1e7e34;
 }
+
+/* Text colors */
+.text-primary { color: var(--primary-medium) !important; }
+.text-secondary { color: var(--primary-dark) !important; }
+
+/* Background colors */
+.bg-primary { background-color: var(--primary-medium) !important; }
+.bg-light { background-color: var(--primary-very-light) !important; }
+.bg-dark { background-color: var(--primary-dark) !important; }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -116,14 +148,14 @@ body {
 }
 
 .user-message {
-    background-color: #007bff;
-    color: white;
+    background-color: #f0f0f0;
+    color: #333;
     margin-left: auto;
     text-align: right;
 }
 
 .bot-message {
-    background-color: #e9ecef;
+    background-color: #f0f0f0;
     color: #333;
     margin-right: auto;
 }

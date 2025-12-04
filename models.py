@@ -108,7 +108,12 @@ def _create_conversation_model():
         keyword_id = _db.Column(_db.Integer, _db.ForeignKey('keywords.id'), nullable=False)
         message = _db.Column(_db.Text, nullable=False)
         timestamp = _db.Column(_db.DateTime, default=datetime.utcnow)
+        sender_type = _db.Column(_db.String(10), default='user')  # 'user' or 'bot'
 
         def __repr__(self):
             return f'<Conversation by {self.user.username} at {self.timestamp}>'
+
+        def is_bot_message(self):
+            """Check if this is a bot message"""
+            return self.sender_type == 'bot'
     return Conversation

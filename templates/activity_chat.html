@@ -82,66 +82,40 @@
 
     <div class="wechat-chat-container">
         <!-- Chat messages container -->
-        <div id="chat-container" class="wechat-messages p-3" style="height: 75vh; overflow-y: auto; background-color: #f0f0f0;">
+        <div id="chat-container" class="wechat-messages p-3">
             {% if conversations %}
                 {% for conv in conversations %}
-                    {% if conv.user_id == session.user_id %}
+                    {% if conv.sender_type == 'user' %}
                         <!-- User message (right-aligned) -->
-                        <div class="message-bubble user-message d-flex justify-content-end mb-3" style="max-width: 90%; background: transparent !important;">
-                            <div class="message-content p-3 rounded-3" style="max-width: 100%; border-bottom-right-radius: 0 !important; background-color: #f0f0f0 !important; color: #000 !important;">
-                                {% if '图片: images/' in conv.message %}
-                                    {% set parts = conv.message.split('图片: ') %}
-                                    {% if parts[0].strip() %}
-                                        <p class="mb-0">{{ parts[0].strip() }}</p>
-                                    {% endif %}
-                                    {% for part in parts[1:] %}
-                                        {% if 'images/' in part %}
-                                            {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
-                                            <div class="message-image">
-                                                <img src="{{ url_for('static', filename=image_path) }}" alt="用户上传的图片" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif '图片已发送: ' in conv.message %}
-                                    {% set parts = conv.message.split('图片已发送: ') %}
-                                    {% if parts[0].strip() %}
-                                        <p class="mb-0">{{ parts[0].strip() }}</p>
-                                    {% endif %}
-                                    {% for part in parts[1:] %}
-                                        {% if 'images/' in part %}
-                                            {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
-                                            <div class="message-image">
-                                                <img src="{{ url_for('static', filename=image_path) }}" alt="用户发送的图片" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <p class="mb-0">{{ conv.message }}</p>
-                                {% endif %}
+                        <div class="message-bubble user-message d-flex justify-content-end mb-3">
+                            <div class="message-content p-3 rounded-3">
+                                {% set message_content = conv.message %}
+                                {% include 'partials/message_content.html' %}
                                 <small class="text-muted">{{ conv.timestamp.strftime('%H:%M') }}</small>
+                            </div>
+                            <div class="user-avatar ms-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center avatar user">
+                                    <span class="text-white fw-bold">
+                                        {% if username %}
+                                            {{ username[0:1].upper() }}
+                                        {% else %}
+                                            U
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     {% else %}
                         <!-- Bot message (left-aligned) -->
                         <div class="message-bubble bot-message d-flex mb-3">
                             <div class="bot-avatar me-2">
-                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center avatar bot">
                                     <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
                                 </div>
                             </div>
-                            <div class="message-content bg-white p-3 rounded-3" style="max-width: 70%; border-bottom-left-radius: 0 !important;">
-                                {% if '图片已发送: ' in conv.message %}
-                                    {% set image_path = conv.message.split('图片已发送: ')[1] %}
-                                    <div class="message-image">
-                                        <img src="{{ url_for('static', filename=image_path) }}" alt="Bot图片" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
-                                    </div>
-                                    {% set text_content = conv.message.split('图片已发送: ')[0] %}
-                                    {% if text_content.strip() %}
-                                        <p class="mb-0">{{ text_content.strip() }}</p>
-                                    {% endif %}
-                                {% else %}
-                                    <p class="mb-0">{{ conv.message }}</p>
-                                {% endif %}
+                            <div class="message-content p-3 rounded-3">
+                                {% set message_content = conv.message %}
+                                {% include 'partials/message_content.html' %}
                                 <small class="text-muted">{{ conv.timestamp.strftime('%H:%M') }}</small>
                             </div>
                         </div>
@@ -151,11 +125,11 @@
                 <!-- Welcome message -->
                 <div class="message-bubble bot-message d-flex mb-3">
                     <div class="bot-avatar me-2">
-                        <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center avatar bot">
                             <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
                         </div>
                     </div>
-                    <div class="message-content bg-white p-3 rounded-3" style="max-width: 70%; border-bottom-left-radius: 0 !important;">
+                    <div class="message-content p-3 rounded-3">
                         <p class="mb-0">你好！欢迎来到 {{ activity.title }} 活动。我可以为你提供关于活动的详细信息。请输入你感兴趣的话题或关键词。</p>
                         <small class="text-muted">{{ activity.created_at.strftime('%H:%M') }}</small>
                     </div>
@@ -176,6 +150,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <style>
+        :root {
+            --primary-dark: #132843;
+            --primary-medium: #3966A2;
+            --primary-background: #F8F6F6;
+            --message-bg: #f0f0f0;
+            --avatar-user-bg: #5a6268;
+            --avatar-bot-bg: var(--primary-medium);
+        }
+
         .wechat-chat-container {
             max-width: 100%;
             height: 100vh;
@@ -186,24 +169,57 @@
         .wechat-messages {
             flex: 1;
             overflow-y: auto;
-            background-color: #f0f0f0;
+            background-color: var(--message-bg);
+            height: 75vh;
         }
 
-        .message-bubble .message-content {
+        .message-bubble {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .message-bubble.user-message {
+            justify-content: flex-end;
+        }
+
+        .message-bubble.bot-message {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            max-width: 70%;
             word-wrap: break-word;
             word-break: break-word;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(19, 40, 67, 0.1);
+            background-color: var(--message-bg) !important;
+            color: var(--primary-dark);
         }
 
+
         .user-message .message-content {
-            background-color: #f0f0f0 !important;
             border-bottom-right-radius: 0 !important;
-            color: #000 !important;
         }
 
         .bot-message .message-content {
-            background-color: #fff !important;
             border-bottom-left-radius: 0 !important;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar.user {
+            background-color: var(--avatar-user-bg) !important;
+        }
+
+        .avatar.bot {
+            background-color: var(--avatar-bot-bg) !important;
         }
 
         /* Smooth scrolling */
@@ -214,7 +230,8 @@
         .wechat-input {
             position: sticky;
             bottom: 0;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 4px rgba(19, 40, 67, 0.1);
+            background-color: var(--primary-background) !important;
         }
 
         .message-image {
@@ -224,6 +241,7 @@
         .message-image img {
             border-radius: 8px;
         }
+
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
