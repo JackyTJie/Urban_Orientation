@@ -7,7 +7,7 @@
         {% if 'images/' in part %}
             {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
             <div class="message-image">
-                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
+                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded img-enlarge" style="max-width: 150px; max-height: 150px; cursor: pointer;">
             </div>
         {% endif %}
     {% endfor %}
@@ -20,7 +20,7 @@
         {% if 'images/' in part %}
             {% set image_path = 'images/' + part.split('images/')[1].split()[0] %}
             <div class="message-image">
-                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded" style="max-width: 150px; max-height: 150px;">
+                <img src="{{ url_for('static', filename=image_path) }}" alt="图片" class="img-fluid rounded img-enlarge" style="max-width: 150px; max-height: 150px; cursor: pointer;">
             </div>
         {% endif %}
     {% endfor %}

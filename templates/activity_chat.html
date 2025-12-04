@@ -243,6 +243,11 @@
         }
 
     </style>
+    <!-- Image Modal -->
+    <div id="image-modal" class="image-modal">
+        <img id="enlarged-image" class="enlarged-image" src="" alt="Enlarged view">
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-scroll to bottom of conversation
@@ -264,7 +269,50 @@
                 document.querySelector('form').submit();
             }
         });
+
+        // Image enlargement functionality
+        const images = document.querySelectorAll('.img-enlarge');
+        const modal = document.getElementById('image-modal');
+        const enlargedImg = document.getElementById('enlarged-image');
+
+        images.forEach(img => {
+            img.addEventListener('click', function(e) {
+                e.stopPropagation();
+                enlargedImg.src = this.src;
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            });
+        });
+
+        // Click on modal to close it (clicking on the enlarged image or background)
+        modal.addEventListener('click', function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        });
     });
     </script>
+
+    <style>
+        /* Image enlargement modal styling */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .enlarged-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            cursor: pointer;
+        }
+    </style>
 </body>
 </html>
