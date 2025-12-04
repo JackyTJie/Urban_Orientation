@@ -86,104 +86,91 @@ Urban_Orientation/
 └── README.md               # This file
 ```
 
-## Key Improvements Implemented
+## Setup and Installation
 
-### 1. Complete Activity Management
-- Fixed missing activity detail route and template
-- Implemented keyword management system
-- Added content management for keywords (text and photo uploads)
-- Created smart bot response system based on keyword matching
+### Prerequisites
+- Python 3.8 or higher
+- pip (Python package installer)
 
-### 2. Enhanced Security Features
-- Implemented protection against root admin role demotion
-- Added file upload validation with allowed extensions
-- Improved input sanitization
+### Installation Steps
 
-### 3. Content Management System
-- Full CRUD operations for keywords and content
-- Support for both text and photo content
-- User interface for managing content by keywords
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/urban-orientation.git
+cd urban-orientation
+```
 
-### 4. WeChat-like Chat Interface
-- Implemented WeChat-style messaging interface
-- Direct access to chat from activity listings
-- Left-aligned bot messages with avatar, right-aligned user messages
-- Improved conversation flow and user experience
-- Smart keyword matching for bot responses
+2. Create a virtual environment:
+```bash
+python -m venv venv
+```
 
-### 5. User Experience Improvements
-- Intuitive content management
-- Better error handling and user feedback
-- Mobile-optimized chat interface
+3. Activate the virtual environment:
+- On Linux/Mac:
+```bash
+source venv/bin/activate
+```
+- On Windows:
+```bash
+venv\Scripts\activate
+```
 
-## Development Milestones
+4. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-### Phase 1: Basic Setup and Authentication (Weeks 1-2)
-1. Set up Flask application with SQLite database
-2. Create database models for Users, Admins, Activities, etc.
-3. Implement user registration and login system
-4. Create admin authentication system with role-based access
-5. Build basic responsive HTML templates with Bootstrap
-6. Implement navigation system (folded navigation for mobile)
+5. Set up the database (the application will create the database automatically on first run)
 
-#### Deliverables:
-- Working Flask application
-- Basic database schema
-- User authentication system
-- Responsive layout with Bootstrap
+6. Run the application:
+```bash
+python app.py
+```
 
-### Phase 2: Activity Management (Weeks 3-4)
-1. Implement admin dashboard for activity creation
-2. Create forms for adding/modifying activities
-3. Implement keyword management for activities
-4. Add content management (text and photo uploads)
-5. Build activity listing page with chronological sorting
-6. Implement activity detail pages
+7. Access the application at `http://localhost:5000`
 
-#### Deliverables:
-- Admin panel for activity management
-- CRUD operations for activities
-- Content upload functionality
-- Activity browsing interface
+## Environment Configuration
 
-### Phase 3: Bot Interaction and Conversation (Weeks 5-6)
-1. Implement bot conversation system
-2. Create conversation history storage
-3. Build WeChat-like user interface for chatting with bots
-4. Link conversations to specific keywords and activities
-5. Display conversation history for users
-6. Implement smart keyword-based responses
-7. Design direct access from activity listings to chat interface
+The application uses the following configuration variables which can be set as environment variables:
 
-#### Deliverables:
-- Working bot conversation system
-- Persistent conversation history
-- WeChat-like chat interface with intelligent responses
+- `SECRET_KEY`: Secret key for session management (defaults to 'your-secret-key-change-in-production')
+- `DATABASE_URL`: Database connection string (defaults to 'sqlite:///urban_orientation.db')
 
-### Phase 4: Admin Account Management (Weeks 7)
-1. Implement root admin account creation
-2. Create admin hierarchy system
-3. Build admin account management interface
-4. Implement password change and account deletion features
-5. Add security measures to prevent role demotion
+## Running the Application
 
-#### Deliverables:
-- Multi-level admin system
-- Account management features
-- Enhanced security measures
+### Development Mode
+To run in development mode with auto-reload enabled:
+```bash
+python app.py
+```
+or
+```bash
+FLASK_ENV=development python app.py
+```
 
-### Phase 5: Content Management and Optimization (Weeks 8-9)
-1. Implement full content management system
-2. Add photo upload capabilities
-3. Create keyword-based content organization
-4. Optimize performance
-5. Mobile responsiveness refinement
-6. Security review and implementation
+### Production Mode
+For production deployment, consider using a WSGI server like Gunicorn:
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
 
-#### Deliverables:
-- Complete content management system
-- Optimized performance
-- Production-ready code
+## Usage
+
+### User Registration and Login
+1. New users can register via the `/register` endpoint
+2. Existing users can log in via the `/login` endpoint
+3. Users can access their profile at `/profile` to view conversation history
+
+### Admin Access
+1. Admins log in at `/login` using admin credentials
+2. Root admin can manage other admin accounts at `/admin/users`
+3. Admins can manage activities, keywords, and content at `/admin/dashboard`
+
+### Activity Management
+- Users can browse activities at `/activities`
+- Chat interfaces are accessible directly from activity listings
+- Admins can create, edit, and delete activities through the admin dashboard
 
 ## Implementation Details
 
@@ -225,14 +212,6 @@ Urban_Orientation/
 - Implement proper session management
 - Password confirmation for sensitive operations
 
-## Deployment Considerations
-- SQLite is suitable for development and small-scale deployment
-- For production, consider PostgreSQL migration
-- Use environment variables for configuration
-- Implement proper logging
-- Set up proper security headers
-- Consider using a WSGI server like Gunicorn for production
-
 ## Security Best Practices Implemented
 - Password hashing with bcrypt
 - Input validation and sanitization
@@ -241,3 +220,11 @@ Urban_Orientation/
 - File upload validation
 - Session management with secure cookies
 - SQL injection prevention via SQLAlchemy ORM
+
+## Deployment Considerations
+- SQLite is suitable for development and small-scale deployment
+- For production, consider PostgreSQL migration
+- Use environment variables for configuration
+- Implement proper logging
+- Set up proper security headers
+- Consider using a WSGI server like Gunicorn for production
