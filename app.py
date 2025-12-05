@@ -47,12 +47,16 @@ def activity_detail(activity_id):
 @app.route('/activity/<int:activity_id>/chat', methods=['GET', 'POST'])
 def activity_chat(activity_id):
     """Chat with the activity bot"""
-    if 'user_id' not in session:
+    if 'user_id' not in session and 'admin_id' not in session:
         flash('Please login to chat with the bot')
         return redirect(url_for('login'))
 
     activity = Activity.query.get_or_404(activity_id)
-    user_id = session['user_id']
+    # Use user_id if available, otherwise use admin_id as the user identifier
+    user_id = session.get('user_id') or session.get('admin_id')
+
+    # Determine if this is an admin accessing the chat
+    is_admin = 'admin_id' in session
 
     if request.method == 'POST':
         user_message = request.form['message']
@@ -141,11 +145,19 @@ def activity_chat(activity_id):
         activity_id=activity_id
     ).order_by(Conversation.timestamp).all()
 
-    # Get the user object to access username
-    from models import User
-    user_obj = User.query.get(user_id)
+    # Get the user object to access username - if it's an admin, use a special indicator
+    if is_admin:
+        # For admin users, we'll use a generic admin name
+        username = "Admin"
+    else:
+        from models import User
+        user_obj = User.query.get(user_id)
+        if user_obj:
+            username = user_obj.username
+        else:
+            username = "User"
 
-    return render_template('activity_chat.html', activity=activity, conversations=conversations, username=user_obj.username)
+    return render_template('activity_chat.html', activity=activity, conversations=conversations, username=username)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

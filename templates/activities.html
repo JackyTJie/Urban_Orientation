@@ -1,25 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">城市定向活动</h1>
-        
-        {% if activities %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 mb-0">
+            <i class="fas fa-compass text-primary me-3"></i>城市定向活动
+        </h1>
+        <div class="text-muted">
+            共 {{ activities|length }} 个活动
+        </div>
+    </div>
+
+    {% if activities %}
+        <div class="row g-4">
             {% for activity in activities %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ activity.title }}</h5>
-                        <p class="card-text">{{ activity.description }}</p>
-                        <p class="text-muted">机器人: {{ activity.bot_name }}</p>
-                        <p class="text-muted">活动时间: {{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-                        <a href="{{ url_for('activity_chat', activity_id=activity.id) }}" class="btn btn-primary">开始探索</a>
+                <div class="col-lg-6 col-xl-4">
+                    <div class="card h-100 shadow-sm hover-card">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-robot me-1"></i>{{ activity.bot_name }}
+                                </span>
+                                <small class="text-muted">
+                                    <i class="far fa-calendar me-1"></i>{{ activity.created_at.strftime('%m-%d') }}
+                                </small>
+                            </div>
+
+                            <h4 class="card-title mb-3">{{ activity.title }}</h4>
+                            <p class="card-text flex-grow-1">{{ activity.description }}</p>
+
+                            <div class="mt-auto pt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="far fa-clock me-1"></i>{{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                    <a href="{{ url_for('activity_chat', activity_id=activity.id) }}" class="btn btn-primary">
+                                        <i class="fas fa-comments me-1"></i>开始探索
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
-        {% else %}
-            <p>暂无活动</p>
-        {% endif %}
-    </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-compass fa-5x text-muted"></i>
+            </div>
+            <h3 class="text-muted">暂无活动</h3>
+            <p class="text-muted">目前没有正在进行的活动，敬请期待！</p>
+        </div>
+    {% endif %}
 </div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+</style>
 {% endblock %}

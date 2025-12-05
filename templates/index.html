@@ -2,65 +2,141 @@
 
 {% block content %}
 <div class="container">
-    <!-- Project Introduction Card -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card bg-light">
-                <div class="card-body text-center">
-                    <h1 class="card-title">欢迎来到城市定向社团</h1>
-                    <p class="lead">探索城市，发现新知，与我们一起开启定向之旅</p>
+    <!-- Hero Section -->
+    <section class="hero-section text-center mb-5">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <i class="fas fa-compass fa-3x text-primary mb-3"></i>
+                    <h1 class="display-4 fw-bold mb-3">欢迎来到城市定向社团</h1>
+                    <p class="lead fs-4 text-muted">探索城市，发现新知，与我们一起开启定向之旅</p>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ url_for('activities') }}" class="btn btn-primary btn-lg me-3 px-4 py-3">
+                        <i class="fas fa-compass me-2"></i>开始探索
+                    </a>
+                    {% if not session.user_id and not session.admin_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg px-4 py-3">
+                        <i class="fas fa-user-plus me-2"></i>加入我们
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Project Description Card -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title text-primary">项目介绍</h3>
-                    <p class="card-text">
-                        城市定向社团是一个专注于城市探索和定向活动的组织。
-                        我们致力于通过定向活动，让人们更深入地了解城市文化，
-                        激发探索精神，提升团队合作能力。
-                    </p>
+    <!-- About Section -->
+    <section class="about-section mb-5">
+        <div class="card border-0 shadow">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-5">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>项目介绍
+                </h2>
 
-                    <h4 class="mt-4 text-secondary">活动特色</h4>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">互动式城市探索</li>
-                        <li class="list-group-item">丰富的知识问答</li>
-                        <li class="list-group-item">智能机器人引导</li>
-                        <li class="list-group-item">个性化活动体验</li>
-                    </ul>
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <p class="fs-5">
+                            城市定向社团是一个专注于城市探索和定向活动的组织。
+                            我们致力于通过定向活动，让人们更深入地了解城市文化，
+                            激发探索精神，提升团队合作能力。
+                        </p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="fas fa-map-marked-alt fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-2">互动式城市探索</h4>
+                                    <p class="mb-0 text-muted">通过智能引导，深度探索城市每个角落</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="fas fa-question-circle fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-2">丰富的知识问答</h4>
+                                    <p class="mb-0 text-muted">在探索中学习，增长城市文化知识</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="fas fa-robot fa-2x text-info"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-2">智能机器人引导</h4>
+                                    <p class="mb-0 text-muted">24/7智能助手，为你提供个性化服务</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start">
+                                <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="fas fa-user-friends fa-2x text-warning"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-2">个性化活动体验</h4>
+                                    <p class="mb-0 text-muted">根据兴趣定制，创造独特探索体验</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Upcoming Activities Card -->
+    <!-- Activities Section -->
     {% if activities %}
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">近期活动</h3>
-                </div>
-                <div class="card-body">
+    <section class="activities-section">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-primary text-white py-4">
+                <h3 class="card-title mb-0 fs-2">
+                    <i class="fas fa-calendar-alt me-2"></i>近期活动
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
                     {% for activity in activities %}
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">{{ activity.title }}</h5>
-                            <p class="card-text">{{ activity.description }}</p>
-                            <small class="text-muted">机器人: {{ activity.bot_name }} | 时间: {{ activity.created_at.strftime('%Y-%m-%d') }}</small>
-                            <a href="{{ url_for('activity_chat', activity_id=activity.id) }}" class="btn btn-outline-primary btn-sm float-end">了解详情</a>
+                    <div class="col-lg-6 col-xl-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-3">
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-robot me-1"></i>{{ activity.bot_name }}
+                                    </span>
+                                </div>
+                                <h4 class="card-title">{{ activity.title }}</h4>
+                                <p class="card-text flex-grow-1">{{ activity.description }}</p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="far fa-calendar me-1"></i>{{ activity.created_at.strftime('%Y-%m-%d') }}
+                                        </small>
+                                        <a href="{{ url_for('activity_chat', activity_id=activity.id) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-comments me-1"></i>立即参与
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
-    </div>
+    </section>
     {% endif %}
 </div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+</style>
 {% endblock %}

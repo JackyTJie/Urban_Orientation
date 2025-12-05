@@ -6,13 +6,15 @@
     <title>{{ activity.title }} - {{ activity.bot_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="d-flex flex-column" style="height: 100vh; margin: 0; min-height: 100vh;">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">城市定向社团</a>
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-compass me-2"></i>城市定向社团
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -21,44 +23,56 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">首页</a>
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('activities') }}">活动</a>
+                        <a class="nav-link" href="{{ url_for('activities') }}">
+                            <i class="fas fa-calendar-alt me-1"></i>活动
+                        </a>
                     </li>
                 </ul>
 
                 <ul class="navbar-nav">
                     {% if session.user_id %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('user_profile') }}">个人资料</a>
+                            <a class="nav-link" href="{{ url_for('user_profile') }}">
+                                <i class="fas fa-user me-1"></i>个人资料
+                            </a>
                         </li>
                     {% endif %}
 
                     {% if session.admin_id %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                管理员
+                                <i class="fas fa-cog me-1"></i>管理员
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">管理面板</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>管理面板</a></li>
                                 {% if session.admin_role == 'root' %}
-                                <li><a class="dropdown-item" href="{{ url_for('create_admin') }}">增加管理员</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('create_admin') }}"><i class="fas fa-user-plus me-2"></i>增加管理员</a></li>
                                 {% endif %}
-                                <li><a class="dropdown-item" href="{{ url_for('admin_profile') }}">个人资料</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('admin_logout') }}">退出</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin_profile') }}"><i class="fas fa-user-cog me-2"></i>个人资料</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin_logout') }}"><i class="fas fa-sign-out-alt me-2"></i>退出</a></li>
                             </ul>
                         </li>
                     {% elif session.user_id %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('logout') }}">退出</a>
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-1"></i>退出
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">登录</a>
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>登录
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register') }}">注册</a>
+                            <a class="nav-link" href="{{ url_for('register') }}">
+                                <i class="fas fa-user-plus me-1"></i>注册
+                            </a>
                         </li>
                     {% endif %}
                 </ul>
@@ -71,8 +85,8 @@
         {% if messages %}
             <div class="container mt-3">
                 {% for message in messages %}
-                    <div class="alert alert-info alert-dismissible fade show" role="alert">
-                        {{ message }}
+                    <div class="alert alert-info alert-dismissible fade show animate-fade-in" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
@@ -80,239 +94,304 @@
         {% endif %}
     {% endwith %}
 
-    <div class="wechat-chat-container">
-        <!-- Chat messages container -->
-        <div id="chat-container" class="wechat-messages p-3">
-            {% if conversations %}
-                {% for conv in conversations %}
-                    {% if conv.sender_type == 'user' %}
-                        <!-- User message (right-aligned) -->
-                        <div class="message-bubble user-message d-flex justify-content-end mb-3">
-                            <div class="message-content p-3 rounded-3">
-                                {% set message_content = conv.message %}
-                                {% include 'partials/message_content.html' %}
-                                <small class="text-muted">{{ conv.timestamp.strftime('%H:%M') }}</small>
-                            </div>
-                            <div class="user-avatar ms-2">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center avatar user">
-                                    <span class="text-white fw-bold">
-                                        {% if username %}
-                                            {{ username[0:1].upper() }}
-                                        {% else %}
-                                            U
-                                        {% endif %}
-                                    </span>
+<div class="container-fluid px-0 flex-grow-1 d-flex flex-column">
+    <div class="row g-0 flex-grow-1">
+        <!-- Sidebar -->
+        <div class="col-lg-3 d-none d-lg-block bg-light border-end">
+            <div class="p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="fas fa-robot text-white fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{{ activity.title }}</h5>
+                        <small class="text-muted">{{ activity.bot_name }}</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="mb-3">活动详情</h6>
+                    <p class="mb-1 text-muted small">{{ activity.description }}</p>
+                    <small class="text-muted">
+                        <i class="far fa-calendar me-1"></i>{{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </small>
+                </div>
+
+                <a href="{{ url_for('activities') }}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-arrow-left me-1"></i> 返回活动列表
+                </a>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-lg-9 col-12 d-flex flex-column h-100" style="min-height: 0;">
+            <!-- Chat Messages -->
+            <div class="chat-container flex-grow-1 d-flex flex-column" id="chat-container">
+                <div class="chat-messages p-0">
+                    {% if conversations %}
+                        {% for conv in conversations %}
+                            {% if conv.sender_type == 'user' %}
+                                <!-- User message -->
+                                <div class="message-bubble user-message d-flex justify-content-end mb-4">
+                                    <div class="d-flex flex-column align-items-end">
+                                        <div class="message-content bg-primary text-white rounded-4 rounded-end-0">
+                                            {% set message_content = conv.message %}
+                                            {% include 'partials/message_content.html' %}
+                                        </div>
+                                        <div class="message-time text-muted mt-1 small">
+                                            <i class="far fa-clock me-1"></i>{{ conv.timestamp.strftime('%H:%M') }}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            {% else %}
+                                <!-- Bot message -->
+                                <div class="message-bubble bot-message d-flex mb-4">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-robot text-primary"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div class="message-content bg-light rounded-4 rounded-start-0">
+                                            {% set message_content = conv.message %}
+                                            {% include 'partials/message_content.html' %}
+                                        </div>
+                                        <div class="message-time text-muted mt-1 small">
+                                            {{ conv.timestamp.strftime('%H:%M') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     {% else %}
-                        <!-- Bot message (left-aligned) -->
-                        <div class="message-bubble bot-message d-flex mb-3">
-                            <div class="bot-avatar me-2">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center avatar bot">
-                                    <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
-                                </div>
+                        <!-- Welcome message -->
+                        <div class="message-bubble bot-message d-flex mb-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="fas fa-robot text-primary"></i>
                             </div>
-                            <div class="message-content p-3 rounded-3">
-                                {% set message_content = conv.message %}
-                                {% include 'partials/message_content.html' %}
-                                <small class="text-muted">{{ conv.timestamp.strftime('%H:%M') }}</small>
+                            <div>
+                                <div class="message-content bg-light p-4 rounded-4 rounded-start-0">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-hand-wave text-primary me-2"></i>你好！
+                                    </h5>
+                                    <p class="mb-0">欢迎来到 {{ activity.title }} 活动！</p>
+                                    <p class="mb-0">我可以为你提供关于活动的详细信息。请输入你感兴趣的话题或关键词。</p>
+                                </div>
+                                <div class="message-time text-muted mt-1 small">
+                                    {{ activity.created_at.strftime('%H:%M') }}
+                                </div>
                             </div>
                         </div>
                     {% endif %}
-                {% endfor %}
-            {% else %}
-                <!-- Welcome message -->
-                <div class="message-bubble bot-message d-flex mb-3">
-                    <div class="bot-avatar me-2">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center avatar bot">
-                            <span class="text-white fw-bold">{{ activity.bot_name[0:1] }}</span>
-                        </div>
-                    </div>
-                    <div class="message-content p-3 rounded-3">
-                        <p class="mb-0">你好！欢迎来到 {{ activity.title }} 活动。我可以为你提供关于活动的详细信息。请输入你感兴趣的话题或关键词。</p>
-                        <small class="text-muted">{{ activity.created_at.strftime('%H:%M') }}</small>
-                    </div>
                 </div>
-            {% endif %}
-        </div>
 
-        <!-- Chat input -->
-        <div class="wechat-input bg-white p-3 border-top">
-            <form method="POST" action="{{ url_for('activity_chat', activity_id=activity.id) }}" class="d-flex mx-2">
-                <input type="text" class="form-control me-2" name="message" id="messageInput"
-                       placeholder="输入消息..." required autocomplete="off" style="max-width: 70%;">
-                <button type="submit" class="btn btn-success">Send</button>
-            </form>
+                <!-- Chat Input -->
+                <div class="chat-input bg-white border-top p-4">
+                    <form method="POST" action="{{ url_for('activity_chat', activity_id=activity.id) }}" class="d-flex">
+                        <input type="text" class="form-control form-control-lg rounded-pill me-2 px-4 py-3" name="message" id="messageInput"
+                               placeholder="输入消息..." required autocomplete="off">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
+                            <i class="fas fa-paper-plane me-1"></i>发送
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <style>
-        :root {
-            --primary-dark: #132843;
-            --primary-medium: #3966A2;
-            --primary-background: #F8F6F6;
-            --message-bg: #f0f0f0;
-            --avatar-user-bg: #5a6268;
-            --avatar-bot-bg: var(--primary-medium);
+<style>
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Take available space */
+    min-height: 0; /* Allow flex child to shrink */
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+
+/* Message bubbles */
+.message-bubble {
+    margin-bottom: 1rem;
+}
+
+/* Message content styling */
+.message-content {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: inline-block;
+    vertical-align: top;
+    line-height: 1.4;
+    height: auto;
+    white-space: normal;
+    padding: 0.5rem 0.75rem;
+    max-width: 75%;
+    word-break: keep-all; /* Keep CJK characters together */
+    overflow-wrap: break-word; /* Break only when necessary */
+    text-align: left;
+}
+
+/* User message specific styles */
+.message-bubble.user-message {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.message-bubble.user-message .message-content {
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-500)) !important;
+    color: white;
+    border-radius: 1rem 0 1rem 1rem;
+    text-align: left !important;
+}
+
+/* Bot message specific styles */
+.message-bubble.bot-message {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.message-bubble.bot-message .message-content {
+    background-color: white !important;
+    border: 1px solid var(--neutral-200);
+    border-radius: 0 1rem 1rem 1rem;
+    text-align: left;
+}
+
+/* Time display */
+.message-time {
+    display: block;
+    text-align: right;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--neutral-500);
+}
+
+/* Image styling */
+img.img-enlarge {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+img.img-enlarge:hover {
+    transform: scale(1.02);
+}
+
+/* Smooth scrolling */
+#chat-container {
+    scroll-behavior: smooth;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .chat-container {
+        height: calc(100vh - 120px); /* Adjusted for navbar height */
+    }
+
+    .message-content {
+        max-width: 85%;
+    }
+}
+
+@media (max-width: 576px) {
+    .chat-container {
+        height: calc(100vh - 100px); /* Smaller navbar on mobile */
+    }
+    .message-content {
+        max-width: 85%;
+    }
+}
+
+/* Avatar elements - maintain circular shape */
+.avatar,
+.bg-primary.rounded-circle.d-flex,
+.bg-warning.rounded-circle.p-2 {
+    flex-shrink: 0; /* Prevent from shrinking in flex containers */
+    align-self: flex-start; /* Don't stretch */
+}
+
+/* Paragraphs within messages */
+.message-content p {
+    margin: 0;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    display: inline;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of conversation
+    const container = document.getElementById('chat-container');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Focus on message input
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.focus();
+    }
+
+    // Handle Enter key to send message (without submitting form)
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('form').submit();
         }
+    });
 
-        .wechat-chat-container {
-            max-width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    // Image enlargement functionality
+    const images = document.querySelectorAll('.img-enlarge');
+    const modal = document.getElementById('image-modal');
+    const enlargedImg = document.getElementById('enlarged-image');
 
-        .wechat-messages {
-            flex: 1;
-            overflow-y: auto;
-            background-color: var(--message-bg);
-            height: 75vh;
-        }
-
-        .message-bubble {
-            display: flex;
-            margin-bottom: 1rem;
-        }
-
-        .message-bubble.user-message {
-            justify-content: flex-end;
-        }
-
-        .message-bubble.bot-message {
-            justify-content: flex-start;
-        }
-
-        .message-content {
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            max-width: 70%;
-            word-wrap: break-word;
-            word-break: break-word;
-            box-shadow: 0 1px 2px rgba(19, 40, 67, 0.1);
-            background-color: var(--message-bg) !important;
-            color: var(--primary-dark);
-        }
-
-
-        .user-message .message-content {
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .bot-message .message-content {
-            border-bottom-left-radius: 0 !important;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar.user {
-            background-color: var(--avatar-user-bg) !important;
-        }
-
-        .avatar.bot {
-            background-color: var(--avatar-bot-bg) !important;
-        }
-
-        /* Smooth scrolling */
-        #chat-container {
-            scroll-behavior: smooth;
-        }
-
-        .wechat-input {
-            position: sticky;
-            bottom: 0;
-            box-shadow: 0 -2px 4px rgba(19, 40, 67, 0.1);
-            background-color: var(--primary-background) !important;
-        }
-
-        .message-image {
-            margin-bottom: 0.5rem;
-        }
-
-        .message-image img {
-            border-radius: 8px;
-        }
-
-    </style>
-    <!-- Image Modal -->
-    <div id="image-modal" class="image-modal">
-        <img id="enlarged-image" class="enlarged-image" src="" alt="Enlarged view">
-    </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-scroll to bottom of conversation
-        const container = document.getElementById('chat-container');
-        if (container) {
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // Focus on message input
-        const messageInput = document.getElementById('messageInput');
-        if (messageInput) {
-            messageInput.focus();
-        }
-
-        // Handle Enter key to send message (without submitting form)
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.querySelector('form').submit();
-            }
-        });
-
-        // Image enlargement functionality
-        const images = document.querySelectorAll('.img-enlarge');
-        const modal = document.getElementById('image-modal');
-        const enlargedImg = document.getElementById('enlarged-image');
-
-        images.forEach(img => {
-            img.addEventListener('click', function(e) {
-                e.stopPropagation();
-                enlargedImg.src = this.src;
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-            });
-        });
-
-        // Click on modal to close it (clicking on the enlarged image or background)
-        modal.addEventListener('click', function() {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Re-enable scrolling
+    images.forEach(img => {
+        img.addEventListener('click', function(e) {
+            e.stopPropagation();
+            enlargedImg.src = this.src;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
         });
     });
-    </script>
 
-    <style>
-        /* Image enlargement modal styling */
-        .image-modal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-        }
+    // Click on modal to close it (clicking on the enlarged image or background)
+    modal.addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    });
+});
+</script>
 
-        .enlarged-image {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            cursor: pointer;
-        }
-    </style>
+<!-- Image Modal -->
+<div id="image-modal" class="image-modal">
+    <img id="enlarged-image" class="enlarged-image" src="" alt="Enlarged view">
+</div>
+
+<style>
+/* Image enlargement modal styling */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+.enlarged-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    cursor: pointer;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

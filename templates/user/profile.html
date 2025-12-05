@@ -1,21 +1,100 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h2>用户资料</h2>
-        <p><strong>用户名:</strong> {{ user.username }}</p>
-        <p><strong>邮箱:</strong> {{ user.email }}</p>
-        <p><strong>注册时间:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
+                            <i class="fas fa-user-circle fa-3x text-primary"></i>
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ user.username }}</h2>
+                        <p class="text-muted">{{ user.email }}</p>
+                    </div>
 
-        <hr>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                        <h5 class="mb-0">用户名</h5>
+                                    </div>
+                                    <p class="fs-5 mb-0">{{ user.username }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-envelope text-success"></i>
+                                        </div>
+                                        <h5 class="mb-0">邮箱</h5>
+                                    </div>
+                                    <p class="fs-5 mb-0">{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-calendar-alt text-info"></i>
+                                        </div>
+                                        <h5 class="mb-0">注册时间</h5>
+                                    </div>
+                                    <p class="fs-5 mb-0">{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-compass text-warning"></i>
+                                        </div>
+                                        <h5 class="mb-0">参与活动</h5>
+                                    </div>
+                                    <p class="fs-5 mb-0">
+                                        {% if conversations_by_activity %}
+                                            {{ conversations_by_activity|length }} 个
+                                        {% else %}
+                                            0 个
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="mt-4">
-            <h4>账户管理</h4>
-            <form method="POST" action="{{ url_for('delete_own_user_account') }}"
-                  onsubmit="return confirm('确定要删除您的账户吗？此操作无法撤销，所有您的数据将被永久删除。');">
-                <button type="submit" class="btn btn-danger">删除账户</button>
-            </form>
+                    <div class="border-top pt-4 mt-4">
+                        <h4 class="mb-4">
+                            <i class="fas fa-cog me-2 text-primary"></i>账户管理
+                        </h4>
+
+                        <div class="d-grid d-md-flex gap-3">
+                            <a href="{{ url_for('activities') }}" class="btn btn-outline-primary flex-fill">
+                                <i class="fas fa-compass me-2"></i>查看更多活动
+                            </a>
+
+                            <form method="POST" action="{{ url_for('delete_own_user_account') }}" class="flex-fill"
+                                  onsubmit="return confirm('确定要删除您的账户吗？此操作无法撤销，所有您的数据将被永久删除。');">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-trash-alt me-2"></i>删除账户
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
